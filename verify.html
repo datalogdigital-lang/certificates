@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Certificate Verification – Verification</title>
+<style>body{margin:0;background:#f3f4f6;color:#14181f;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}.w{max-width:520px;margin:0 auto;padding:20px}h1{font-size:20px;margin:8px 0 2px}p{margin:0 0 16px;color:#667085}
+form{display:flex;gap:8px;margin-bottom:16px}input{flex:1;padding:11px;border:1px solid #d0d5dd;border-radius:8px;font:inherit;background:#fff;color:inherit}button{padding:11px 16px;border:0;border-radius:8px;background:#1d4e89;color:#fff;font:600 15px inherit}
+.ok{background:#e7f6ee;color:#157347;padding:12px 14px;border-radius:10px 10px 0 0;font-size:17px}.cd{background:#fff;border:1px solid #e0e3e8;border-radius:0 0 10px 10px;padding:14px;text-align:center}.cd img{width:96px;height:120px;object-fit:cover;border-radius:6px;border:1px solid #e0e3e8;margin-bottom:8px}
+table{width:100%;border-collapse:collapse;text-align:left}th,td{padding:8px 6px;border-bottom:1px solid #eef0f3;vertical-align:top}th{color:#667085;font-weight:600;width:40%;font-size:14px}.e{background:#fdecea;color:#b42318;padding:14px;border-radius:10px}
+@media(prefers-color-scheme:dark){body{background:#111317;color:#eceef2}input,.cd{background:#1b1e24;border-color:#2f343d}.ok{background:#12301f;color:#4cc38a}th{color:#98a2b3}td,th{border-color:#2f343d}.e{background:#3a1a17;color:#f97066}}</style></head>
+<body><div class="w"><h1>Certificate Verification</h1><p>Certificate verification</p>
+<form id="f"><input id="n" placeholder="Certificate number" autocomplete="off"><button>Verify</button></form><div id="o"></div></div>
+<script>
+var L={type:"Certificate type",name:"Name",student_id:"Student ID",school:"School",district:"District",session:"Session",klass:"Class",total:"Total",grade:"Grade"};
+var out=document.getElementById("o"),inp=document.getElementById("n"),DATA=null;
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function find(c){c=c.trim().toLowerCase();for(var k in DATA.records)if(k.toLowerCase()==c)return[k,DATA.records[k]];return null}
+function show(c){out.innerHTML="";if(!c)return;if(!DATA){out.innerHTML='<div class="e">Could not load the records. Open this page from your website address, not from a local file.</div>';return}
+var f=find(c);if(!f){out.innerHTML='<div class="e"><b>Not found.</b> No certificate with number “'+esc(c)+'” was issued.</div>';return}
+var r=f[1],h='<div class="ok"><b>✔ Certificate verified</b></div><div class="cd">';if(r.photo)h+='<img src="'+r.photo+'" alt="">';
+h+='<table><tr><th>Certificate no.</th><td>'+esc(f[0])+'</td></tr>';for(var k in L){if(r[k]!==undefined&&r[k]!=="")h+='<tr><th>'+L[k]+'</th><td>'+esc(r[k])+'</td></tr>'}out.innerHTML=h+'</table></div>'}
+document.getElementById("f").onsubmit=function(e){e.preventDefault();show(inp.value)};
+var p=new URLSearchParams(location.search).get("c")||decodeURIComponent(location.hash.slice(1));if(p)inp.value=p;
+fetch("records.json?v="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){DATA=d}).catch(function(){}).then(function(){show(p)});
+</script></body></html>
